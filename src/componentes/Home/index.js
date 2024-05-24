@@ -98,6 +98,14 @@ function Home() {
         <HomeContainer>
             <Aside>
                 <Button>Criar Novo Cliente</Button>
+                <div className='filtros'>
+                    <a href='localhost:3000'>* Todos</a>
+                    <a href='localhost:3000'>* Ativos</a>
+                    <a href='localhost:3000'>* Inativos</a>
+                    <a href='localhost:3000'>* Pendentes</a>
+                    <a href='localhost:3000'>* Ordem A-Z </a>
+                    <a href='localhost:3000'>* Ordem Z-A</a>
+                </div>
             </Aside>
             <MainContent>
                 <Title>Gestão de Beneficiários</Title>
