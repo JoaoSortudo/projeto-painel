@@ -1,10 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { createGlobalStyle } from 'styled-components';
 import Header from './componentes/Header';
-import Home from './componentes/Home';
+import Home from './rotas/Home';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import ClienteCadastro from './rotas/Clientes_Cadastro';
+import ClienteUpdate from './rotas/Clientes_Update';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -31,8 +33,14 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <GlobalStyle/>
-    <Header />
-    <Home/>
+    <BrowserRouter>
+      <Header />
+      <Routes>
+        <Route path='/' element={<Home/>} />
+        <Route path='/clientes_cadastro' element={<ClienteCadastro/>} />
+        <Route path='/clientes_update' element={<ClienteUpdate/>} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );
 

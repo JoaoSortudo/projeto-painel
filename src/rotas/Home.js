@@ -1,5 +1,9 @@
 import React from 'react';
+//import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { getClientes } from '../servicos/clientes';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const HomeContainer = styled.div`
     display: flex;
@@ -87,25 +91,43 @@ const Button = styled.button`
     }
 `;
 
-const clientes = [
-    { nome: "João Silva", cpf: "123.456.789-00", nascimento: "01/01/1980", status: "Ativo" },
-    { nome: "Maria Oliveira", cpf: "987.654.321-00", nascimento: "15/05/1975", status: "Inativo" },
-    { nome: "Carlos Pereira", cpf: "456.789.123-00", nascimento: "30/09/1990", status: "Ativo" }
-];
+const Filtros = styled.div`
+    display: flex;
+    flex-direction: column;
+`
+
+const clientes = getClientes();
+console.log(clientes)
 
 function Home() {
+    const [clientes, setClientes] = useState([]);
+
+    useEffect(() => {
+        async function fetchClientes() {
+            try {
+                const clientesDaApi = await getClientes();
+                setClientes(clientesDaApi);
+            } catch (error) {
+                console.error('Erro ao obter clientes:', error);
+            }
+        }
+
+        fetchClientes();
+    }, []); 
     return (
         <HomeContainer>
             <Aside>
-                <Button>Criar Novo Cliente</Button>
-                <div className='filtros'>
+                <Link to='/clientes_cadastro'>
+                    <Button>Criar Novo Cliente</Button>
+                </Link>
+                <Filtros>
                     <a href='localhost:3000'>* Todos</a>
                     <a href='localhost:3000'>* Ativos</a>
                     <a href='localhost:3000'>* Inativos</a>
                     <a href='localhost:3000'>* Pendentes</a>
                     <a href='localhost:3000'>* Ordem A-Z </a>
                     <a href='localhost:3000'>* Ordem Z-A</a>
-                </div>
+                </Filtros>
             </Aside>
             <MainContent>
                 <Title>Gestão de Beneficiários</Title>
@@ -125,7 +147,9 @@ function Home() {
                             <span>{cliente.status}</span>
                             <ClienteActions>
                                 <Button>Detalhes</Button>
-                                <Button>Editar</Button>
+                                <Link to='/clientes_update'>
+                                    <Button>Editar</Button>
+                                </Link>
                             </ClienteActions>
                         </ClienteRow>
                     ))}

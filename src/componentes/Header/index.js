@@ -1,3 +1,5 @@
+//import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const HeaderContainer = styled.header`
@@ -15,7 +17,9 @@ const BotoesContainer = styled.div`
 function Header() {
     return(
         <HeaderContainer>
-            <h1>Clientes</h1>
+            <Link to='/'>
+                <h1>Clientes</h1>
+            </Link>
             <BotoesContainer>
                 <input placeholder="Pesquisar(nome, cpf, etc...)"/>
                 <button>Sair</button>
