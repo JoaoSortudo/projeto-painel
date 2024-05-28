@@ -38,7 +38,7 @@ root.render(
       <Routes>
         <Route path='/' element={<Home/>} />
         <Route path='/clientes_cadastro' element={<ClienteCadastro/>} />
-        <Route path='/clientes_update' element={<ClienteUpdate/>} />
+        <Route path='/clientes_update/:id' element={<ClienteUpdate/>} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

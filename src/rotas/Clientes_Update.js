@@ -1,4 +1,7 @@
-import styled from "styled-components";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import { patchCliente, getClientes } from '../servicos/clientes';
 
 //#region estilos da pagina
 const Button = styled.button`
@@ -49,13 +52,13 @@ const UpdateDependente = styled.section`
     width: 50%;
 `;
 
-const Select = styled.select`
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-`;
+//const Select = styled.select`
+//    width: 100%;
+//   padding: 10px;
+//    margin-bottom: 15px;
+//   border: 1px solid #ccc;
+//    border-radius: 5px;
+//`;
 
 const Legend = styled.legend`
     font-size: 1.2em;
@@ -64,70 +67,156 @@ const Legend = styled.legend`
 //#endregion
 
 function ClienteUpdate() {
+    const { id } = useParams();
+    const [formData, setFormData] = useState({
+        nome: '',
+        cpf: '',
+        nascimento: '',
+        email: '',
+        telefone: '',
+        cep: '',
+        endereco: '',
+        cidade: '',
+        estado: '',
+        status: 'Ativo',
+        classe: 'Independente',
+        cpfTitular: 'null',
+        tipoPlano: 'clinico',
+        tipoPagamento: 'recorrencia',
+    });
+
+    useEffect(() => {
+        async function fetchCliente() {
+            try {
+                const clientes = await getClientes();
+                const cliente = clientes.find(cliente => cliente.id === parseInt(id, 10));
+                if (cliente) {
+                    setFormData(cliente);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar cliente:', error);
+            }
+        }
+        fetchCliente();
+    }, [id]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            console.log('ID do cliente:', id); // Verificando o ID
+            console.log('Dados do formulário:', formData); // Verificando os dados do formulário
+            await patchCliente(id, formData);
+            alert('Cliente editado com sucesso');
+        } catch (error) {
+            console.error('Erro ao editar cliente:', error);
+        }
+    };
+
     return (
-        <FormUpdate>
+        <FormUpdate onSubmit={handleSubmit}>
             <UpdateContainer>
                 <UpdateCliente>
                     <fieldset>
                         <Legend>Cliente</Legend>
                         <div>
                             <Label htmlFor="nomeCompleto">Nome completo:</Label>
-                            <Input type="text" id="nomeCompleto" name="nomeCompleto" required />
+                            <Input
+                                type="text"
+                                id="nomeCompleto"
+                                name="nome"
+                                value={formData.nome}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
                         <FlexContainer>
                             <FlexItem>
                                 <Label htmlFor="cpf">CPF (apenas números):</Label>
-                                <Input type="text" id="cpf" maxLength="11" name="cpf" required />
+                                <Input
+                                    type="text"
+                                    id="cpf"
+                                    name="cpf"
+                                    maxLength="11"
+                                    value={formData.cpf}
+                                    onChange={handleChange}
+                                    required
+                                />
                             </FlexItem>
                             <FlexItem>
                                 <Label htmlFor="nascimento">Data de nascimento:</Label>
-                                <Input type="date" id="nascimento" name="nascimento" required />
+                                <Input
+                                    type="date"
+                                    id="nascimento"
+                                    name="nascimento"
+                                    value={formData.nascimento}
+                                    onChange={handleChange}
+                                    required
+                                />
                             </FlexItem>
                         </FlexContainer>
                         <FlexContainer>
                             <FlexItem>
                                 <Label htmlFor="telefone">Telefone:</Label>
-                                <Input type="tel" id="telefone" name="telefone" required />
+                                <Input
+                                    type="tel"
+                                    id="telefone"
+                                    name="telefone"
+                                    value={formData.telefone}
+                                    onChange={handleChange}
+                                    required
+                                />
                             </FlexItem>
                             <FlexItem>
                                 <Label htmlFor="cep">CEP:</Label>
-                                <Input type="text" id="cep" name="cep" required />
+                                <Input
+                                    type="text"
+                                    id="cep"
+                                    name="cep"
+                                    value={formData.cep}
+                                    onChange={handleChange}
+                                    required
+                                />
                             </FlexItem>
                         </FlexContainer>
                         <div>
                             <Label htmlFor="endereco">Endereço:</Label>
-                            <Input type="text" id="endereco" name="endereco" />
+                            <Input
+                                type="text"
+                                id="endereco"
+                                name="endereco"
+                                value={formData.endereco}
+                                onChange={handleChange}
+                            />
                         </div>
                         <FlexContainer>
                             <FlexItem>
                                 <Label htmlFor="cidade">Cidade:</Label>
-                                <Input type="text" id="cidade" name="cidade" required />
+                                <Input
+                                    type="text"
+                                    id="cidade"
+                                    name="cidade"
+                                    value={formData.cidade}
+                                    onChange={handleChange}
+                                    required
+                                />
                             </FlexItem>
                             <FlexItem>
                                 <Label htmlFor="estado">Estado:</Label>
-                                <Input type="text" id="estado" name="estado" required />
+                                <Input
+                                    type="text"
+                                    id="estado"
+                                    name="estado"
+                                    value={formData.estado}
+                                    onChange={handleChange}
+                                    required
+                                />
                             </FlexItem>
                         </FlexContainer>
-                    </fieldset>
-                    <h1>Mais Informações</h1>
-                    <fieldset>
-                        <Legend>Plano</Legend>
-                        <div>
-                            <Label htmlFor="tipoPlano">Tipo de plano:</Label>
-                            <Select id="tipoPlano" name="tipoPlano">
-                                <option value="clinico">Clínico (G)</option>
-                                <option value="psicologia">Psicologia (P)</option>
-                                <option value="G+P">Clínico + Psicologia (GP)</option>
-                                <option value="G+S">Clínico + Especialista (GS)</option>
-                                <option value="G+S+P">Clínico + Especialista + Psicologia (P)</option>
-                            </Select>
-                            <Label htmlFor="tipoPagamento">Tipo de pagamento:</Label>
-                            <Select id="tipoPlano" name="tipoPlano">
-                                <option value="recorrencia">Recorrência</option>
-                                <option value="consulta">Consulta</option>
-                            </Select>
-                        </div>
-                        {/* Adicione os outros campos aqui conforme necessário */}
                     </fieldset>
                 </UpdateCliente>
                 <UpdateDependente>

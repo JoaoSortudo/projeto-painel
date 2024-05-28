@@ -1,9 +1,12 @@
+import React, { useState } from "react";
 import styled from "styled-components";
+import { postCliente } from "../servicos/clientes";
+
 
 //#region estilos da pagina
 const Button = styled.button`
     width: auto;
-`
+`;
 
 const FormCadastro = styled.form`
     background: white;
@@ -14,7 +17,7 @@ const FormCadastro = styled.form`
 
 const CadastroContainer = styled.div`
     display: flex;
-`
+`;
 
 const Label = styled.label`
     margin-bottom: 10px;
@@ -62,49 +65,87 @@ const Legend = styled.legend`
     font-weight: bold;
 `;
 //#endregion
+
 function ClienteCadastro() {
+    const [formData, setFormData] = useState({
+        nome: '',
+        cpf: '',
+        nascimento: '',
+        email: '',
+        telefone: '',
+        cep: '',
+        endereco: '',
+        cidade: '',
+        estado: '',
+        status:"Ativo",
+        classe:"Independente",
+        cpfTitular:"null",
+        tipoPlano:'clinico',
+        tipoPagamento: 'recorrencia',
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const newCliente = await postCliente(formData);
+            console.log('Cliente criado com sucesso:', newCliente);
+            alert('Cliente cadastrado com sucesso')
+        } catch (error) {
+            console.error('Erro ao criar cliente:', error);
+        }
+    };
+
     return (
-        <FormCadastro>
+        <FormCadastro onSubmit={handleSubmit}>
             <CadastroContainer>
                 <CadastroCliente>
                     <fieldset>
                         <Legend>Cliente</Legend>
                         <div>
-                            <Label htmlFor="nomeCompleto">Nome completo:</Label>
-                            <Input type="text" id="nomeCompleto" name="nomeCompleto" required />
+                            <Label htmlFor="nome">Nome completo:</Label>
+                            <Input type="text" id="nome" name="nome" value={formData.nome} onChange={handleChange} required />
                         </div>
                         <FlexContainer>
                             <FlexItem>
                                 <Label htmlFor="cpf">CPF (apenas números):</Label>
-                                <Input type="text" id="cpf" maxLength="11" name="cpf" required />
+                                <Input type="text" id="cpf" maxLength="11" name="cpf" value={formData.cpf} onChange={handleChange} required />
                             </FlexItem>
                             <FlexItem>
                                 <Label htmlFor="nascimento">Data de nascimento:</Label>
-                                <Input type="date" id="nascimento" name="nascimento" required />
+                                <Input type="date" id="nascimento" name="nascimento" value={formData.nascimento} onChange={handleChange} required />
                             </FlexItem>
                         </FlexContainer>
+                        <div>
+                            <Label htmlFor="email">E-mail:</Label>
+                            <Input type="text" id="email" name="email" value={formData.email} onChange={handleChange} required />
+                        </div>
                         <FlexContainer>
                             <FlexItem>
                                 <Label htmlFor="telefone">Telefone:</Label>
-                                <Input type="tel" id="telefone" name="telefone" required />
+                                <Input type="tel" id="telefone" name="telefone" value={formData.telefone} onChange={handleChange} required />
                             </FlexItem>
                             <FlexItem>
                                 <Label htmlFor="cep">CEP:</Label>
-                                <Input type="text" id="cep" name="cep" required />
+                                <Input type="text" id="cep" name="cep" value={formData.cep} onChange={handleChange} required />
                             </FlexItem>
                         </FlexContainer>
                         <div>
                             <Label htmlFor="endereco">Endereço:</Label>
-                            <Input type="text" id="endereco" name="endereco" />
+                            <Input type="text" id="endereco" name="endereco" value={formData.endereco} onChange={handleChange} />
                         </div>
                         <FlexContainer>
                             <FlexItem>
                                 <Label htmlFor="cidade">Cidade:</Label>
-                                <Input type="text" id="cidade" name="cidade" required />
+                                <Input type="text" id="cidade" name="cidade" value={formData.cidade} onChange={handleChange} required />
                             </FlexItem>
                             <FlexItem>
                                 <Label htmlFor="estado">Estado:</Label>
-                                <Input type="text" id="estado" name="estado" required />
+                                <Input type="text" id="estado" name="estado" value={formData.estado} onChange={handleChange} required />
                             </FlexItem>
                         </FlexContainer>
                     </fieldset>
@@ -113,7 +154,7 @@ function ClienteCadastro() {
                         <Legend>Plano</Legend>
                         <div>
                             <Label htmlFor="tipoPlano">Tipo de plano:</Label>
-                            <Select id="tipoPlano" name="tipoPlano">
+                            <Select id="tipoPlano" name="tipoPlano" value={formData.tipoPlano} onChange={handleChange}>
                                 <option value="clinico">Clínico (G)</option>
                                 <option value="psicologia">Psicologia (P)</option>
                                 <option value="G+P">Clínico + Psicologia (GP)</option>
@@ -121,19 +162,18 @@ function ClienteCadastro() {
                                 <option value="G+S+P">Clínico + Especialista + Psicologia (P)</option>
                             </Select>
                             <Label htmlFor="tipoPagamento">Tipo de pagamento:</Label>
-                            <Select id="tipoPlano" name="tipoPlano">
+                            <Select id="tipoPagamento" name="tipoPagamento" value={formData.tipoPagamento} onChange={handleChange}>
                                 <option value="recorrencia">Recorrência</option>
                                 <option value="consulta">Consulta</option>
                             </Select>
                         </div>
-                        {/* Adicione os outros campos aqui conforme necessário */}
                     </fieldset>
                 </CadastroCliente>
                 <CadastroDependente>
-                    <button>Adicionar</button>
+                    <button type="button">Adicionar</button>
                 </CadastroDependente>
             </CadastroContainer>
-            <Button type="submit" onClick={}>Cadastrar</Button>
+            <Button type="submit">Cadastrar</Button>
         </FormCadastro>
     );
 }

@@ -8,15 +8,39 @@ async function getClientes(){
     return response.data
 }
 
-// async function deleteClientes(){
-//     const response = await clientesAPI.delete('/')
+async function deleteCliente(clienteId) {
+    try {
+        const response = await clientesAPI.delete(`/${clienteId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao excluir cliente:', error);
+        throw error;
+    }
+}
 
-//     return response.data
-// }
+async function postCliente(clienteData) {
+    try {
+        const response = await clientesAPI.post('/', clienteData);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating client:', error);
+        throw error;
+    }
+}
 
-
+async function patchCliente(clienteId, clienteData) {
+    try {
+        const response = await clientesAPI.patch(`/${clienteId}`, clienteData);
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao editar cliente:', error);
+        throw error;
+    }
+}
 
 export {
     getClientes,
-    //deleteClientes
+    deleteCliente,
+    postCliente,
+    patchCliente
 }

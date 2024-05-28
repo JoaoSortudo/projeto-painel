@@ -1,10 +1,11 @@
 import React from 'react';
 //import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { getClientes } from '../servicos/clientes';
+import { getClientes, deleteCliente } from '../servicos/clientes';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+//#region estilos
 const HomeContainer = styled.div`
     display: flex;
     justify-content: center;
@@ -95,12 +96,45 @@ const Filtros = styled.div`
     display: flex;
     flex-direction: column;
 `
+const Modal = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo escuro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999; /* Garante que a modal fique acima de outros elementos */
+`;
 
+const ModalContent = styled.div`
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+`;
+
+const CloseButton = styled.button`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #555;
+`;
+
+//#endregion
 const clientes = getClientes();
 console.log(clientes)
 
 function Home() {
     const [clientes, setClientes] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedClient, setSelectedClient] = useState(null);
 
     useEffect(() => {
         async function fetchClientes() {
@@ -114,6 +148,33 @@ function Home() {
 
         fetchClientes();
     }, []); 
+
+    const showClientDetails = (cliente) => {
+        setSelectedClient(cliente);
+        setShowModal(true);
+    };
+
+    const deleteClient = async (clientId) => {
+        try {
+            console.log("ID do cliente a ser excluído:", clientId); // Adicione este log
+            await deleteCliente(clientId);
+    
+            // Atualizar a lista de clientes após a exclusão
+            const updatedClientes = clientes.filter(cliente => cliente.id !== clientId);
+            console.log("Lista de clientes atualizada:", updatedClientes); // Adicione este log
+    
+            setClientes(updatedClientes);
+            setShowModal(false);
+        } catch (error) {
+            console.error('Erro ao excluir cliente:', error);
+        }
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
+
     return (
         <HomeContainer>
             <Aside>
@@ -139,22 +200,45 @@ function Home() {
                     <span>Ações</span>
                 </HeaderRow>
                 <ClientesContainer>
-                    {clientes.map((cliente, index) => (
-                        <ClienteRow key={index}>
-                            <span>{cliente.nome}</span>
-                            <span>{cliente.cpf}</span>
-                            <span>{cliente.nascimento}</span>
-                            <span>{cliente.status}</span>
-                            <ClienteActions>
-                                <Button>Detalhes</Button>
-                                <Link to='/clientes_update'>
-                                    <Button>Editar</Button>
-                                </Link>
-                            </ClienteActions>
-                        </ClienteRow>
-                    ))}
+                    {clientes.map((cliente, index) => {
+                        // Dividir a data de nascimento em partes
+                        const partes = cliente.nascimento.split('-');
+                        // Reorganizando as partes para dd/mm/aaaa
+                        const dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+                        return (
+                            <ClienteRow key={index}>
+                                <span>{cliente.nome}</span>
+                                <span>{cliente.cpf}</span>
+                                <span>{dataFormatada}</span>
+                                <span>{cliente.status}</span>
+                                <ClienteActions>
+                                    <Button onClick={() => showClientDetails(cliente)}>Detalhes</Button>
+                                    <Link to={`/clientes_update/${cliente.id}`}>
+                                        <Button>Editar</Button>
+                                    </Link>
+                                </ClienteActions>
+                            </ClienteRow>
+                        );
+                    })}
                 </ClientesContainer>
             </MainContent>
+            {showModal && (
+                <Modal>
+                    <ModalContent>
+                        <CloseButton onClick={closeModal}>Fechar</CloseButton>
+                        <h2>Detalhes do Cliente</h2>
+                        {selectedClient && (
+                            <div>
+                                <p>Nome: {selectedClient.nome}</p>
+                                <p>CPF: {selectedClient.cpf}</p>
+                                {/* Outros detalhes do cliente */}
+                                <Button onClick={() => deleteClient(selectedClient.id)}>Excluir</Button>
+                            </div>
+                        )}
+                    </ModalContent>
+                </Modal>
+            )}
         </HomeContainer>
     );
 }
